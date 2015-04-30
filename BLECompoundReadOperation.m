@@ -20,16 +20,16 @@
 #pragma mark - Lifecycle
 
 //**************************************************************************************************
-- (instancetype) initWithCentralManager: (CBCentralManager *) centralManager
-                             peripheral: (CBPeripheral *) peripheral
-                            serviceUuid: (CBUUID *) serviceUuid
-                     characteristicUuid: (CBUUID *) characteristicUuid
-                             completion: (BLEReadCharacteristicOperationCallback) completion
+- (instancetype) initWithOperationsManager: (BLEOperationsManager *) operationsManager
+                                peripheral: (CBPeripheral *) peripheral
+                               serviceUuid: (CBUUID *) serviceUuid
+                        characteristicUuid: (CBUUID *) characteristicUuid
+                                completion: (BLEReadCharacteristicOperationCallback) completion
 {
-    self = [super initWithCentralManager: centralManager
-                              peripheral: peripheral
-                             serviceUuid: serviceUuid
-                      characteristicUuid: characteristicUuid];
+    self = [super initWithOperationsManager: operationsManager
+                                 peripheral: peripheral
+                                serviceUuid: serviceUuid
+                         characteristicUuid: characteristicUuid];
     
     if (self)
     {

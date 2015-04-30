@@ -12,12 +12,6 @@
 
 @interface BLECompoundReadOperation : BLECompoundOperation
 
-- (instancetype) initWithCentralManager: (CBCentralManager *) centralManager
-                             peripheral: (CBPeripheral *) peripheral
-                            serviceUuid: (CBUUID *) serviceUuid
-                     characteristicUuid: (CBUUID *) characteristicUuid
-                             completion: (BLEReadCharacteristicOperationCallback) completion;
-
 - (instancetype) initWithOperationsManager: (BLEOperationsManager *) operationsManager
                                 peripheral: (CBPeripheral *) peripheral
                                serviceUuid: (CBUUID *) serviceUuid

@@ -18,22 +18,22 @@
 
 @implementation BLECompoundWriteOperation
 
-- (instancetype) initWithCentralManager: (CBCentralManager *) centralManager
-                             peripheral: (CBPeripheral *) peripheral
-                            serviceUuid: (CBUUID *) serviceUuid
-                     characteristicUuid: (CBUUID *) characteristicUuid
-                                   data: (NSData *) data
-                             completion: (BLEWriteCharacteristicOperationCallback) completion
+- (instancetype) initWithOperationsManager: (BLEOperationsManager *) operationsManager
+                                peripheral: (CBPeripheral *) peripheral
+                               serviceUuid: (CBUUID *) serviceUuid
+                        characteristicUuid: (CBUUID *) characteristicUuid
+                                      data: (NSData *) data
+                                completion: (BLEWriteCharacteristicOperationCallback) completion
 {
     if (!data)
     {
         return nil;
     }
     
-    self = [super initWithCentralManager: centralManager
-                              peripheral: peripheral
-                             serviceUuid: serviceUuid
-                      characteristicUuid: characteristicUuid];
+    self = [super initWithOperationsManager: operationsManager
+                                 peripheral: peripheral
+                                serviceUuid: serviceUuid
+                         characteristicUuid: characteristicUuid];
     
     if (self)
     {

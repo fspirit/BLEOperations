@@ -14,32 +14,6 @@
 
 @implementation BLECompoundOperation
 
-- (instancetype) initWithCentralManager: (CBCentralManager *) centralManager
-                             peripheral: (CBPeripheral *) peripheral
-                            serviceUuid: (CBUUID *) serviceUuid
-                     characteristicUuid: (CBUUID *) characteristicUuid
-{
-    if (centralManager == nil ||
-        peripheral == nil ||
-        serviceUuid == nil ||
-        characteristicUuid == nil)
-    {
-        return nil;
-    }
-    
-    self = [super init];
-    
-    if (self)
-    {
-        self.centralManager = centralManager;
-        self.peripheral = peripheral;
-        self.serviceUuid = serviceUuid;
-        self.characteristicUuid = characteristicUuid;
-    }
-    
-    return self;
-}
-
 //**************************************************************************************************
 - (instancetype) initWithOperationsManager: (BLEOperationsManager *) operationsManager
                                 peripheral: (CBPeripheral *) peripheral
