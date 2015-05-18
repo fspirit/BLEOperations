@@ -10,7 +10,7 @@
 #import "BLEOperationErrors.h"
 #import "BLEOperationsConstants.h"
 
-@interface BLEOperation ()
+@interface BLEOperation () <CBCentralManagerDelegate>
 
 @property (assign) BOOL didTimedOut;
 
@@ -42,59 +42,15 @@
     if (self)
     {
         self.didTimedOut = NO;
+
+        self.centralManager = centralManager;
+        self.centralManager.delegate = self;
         
         self.peripheral = peripheral;
-        self.centralManager = centralManager;
         self.timeout = timeout;
-        
-        
-        [self.centralManager addObserver: self
-                              forKeyPath: @"state"
-                                 options: NSKeyValueObservingOptionNew
-                                 context: NULL];
-        
-        [self.peripheral addObserver: self
-                          forKeyPath: @"state"
-                             options: NSKeyValueObservingOptionNew
-                             context: NULL];
-        
     }
     
     return self;
-}
-
-//**************************************************************************************************
-- (void) dealloc
-{
-    [self.centralManager removeObserver: self forKeyPath: @"state"];
-    [self.peripheral removeObserver: self forKeyPath: @"state"];
-}
-
-//**************************************************************************************************
-- (void) observeValueForKeyPath: (NSString *) keyPath
-                       ofObject: (id) object
-                         change: (NSDictionary *) change
-                        context: (void *) context
-{
-    if ([keyPath isEqualToString: @"state"])
-    {
-        if ([object isEqual: self.centralManager])
-        {
-            CBCentralManagerState state = [change[NSKeyValueChangeNewKey] integerValue];
-            if (state != CBCentralManagerStatePoweredOn)
-            {
-               [self callbackWithError:  [BLEOperationErrors bleIsUnavailableError]];
-            }
-        }
-        else if ([object isEqual: self.peripheral])
-        {
-            CBPeripheralState state = [change[NSKeyValueChangeNewKey] integerValue];
-            if (state == CBPeripheralStateDisconnected)
-            {
-                [self callbackWithError: [BLEOperationErrors peripheralDidDisconnectError]];
-            }
-        }
-    }
 }
 
 //**************************************************************************************************
@@ -139,7 +95,7 @@
         
         self.didTimedOut = YES;
         
-        [self callbackWithError: [BLEOperationErrors timeoutError]];
+        [self failWithError: [BLEOperationErrors timeoutError]];
     }
 }
 
@@ -152,12 +108,14 @@
 //**************************************************************************************************
 - (void) start
 {
-    if (self.centralManager.state != CBCentralManagerStatePoweredOn)
+    if (self.centralManager.state == CBCentralManagerStatePoweredOn)
     {
-        [self callbackWithError: [BLEOperationErrors bleIsUnavailableError]];
+        [self execute];
     }
-    
-    [self execute];
+    else
+    {
+        [self failWithError: [BLEOperationErrors bleIsUnavailableError]];
+    }
 }
 
 //**************************************************************************************************
@@ -170,18 +128,35 @@
 }
 
 //**************************************************************************************************
-- (void) centralManager: (CBCentralManager *) central didDisconnectPeripheral: (CBPeripheral *) peripheral
-                  error: (NSError *) error
+- (void) failWithError: (NSError *) error
 {
-    if (error != nil)
+    if (self.errorCallback)
     {
-        [self callbackWithError: error];
-    }
-    else
-    {
-        [self callbackWithError: [BLEOperationErrors peripheralDidDisconnectError]];
+        BLEOperationErrorCallback callback = self.errorCallback;
+        self.errorCallback = nil;
+        
+        callback(error);
     }
 }
+
+//**************************************************************************************************
+- (void) centralManagerDidUpdateState: (CBCentralManager *) central
+{
+    if (central.state != CBCentralManagerStatePoweredOn)
+    {
+        [self failWithError: [BLEOperationErrors bleIsUnavailableError]];
+    }
+}
+
+//**************************************************************************************************
+- (void) centralManager: (CBCentralManager *) central
+didDisconnectPeripheral: (CBPeripheral *) peripheral
+                  error: (NSError *) error
+{
+    [self failWithError: error];
+}
+
+
 
 
 @end

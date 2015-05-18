@@ -14,7 +14,7 @@
 @interface BLEConnectPeripheralOperation () <CBCentralManagerDelegate>
 
 @property (copy) BLEConnectPeripheralOperationCallback callback;
-@property (assign) id<CBCentralManagerDelegate> centralManagerDelegate;
+
 
 @end
 
@@ -37,20 +37,15 @@
     {
         self.callback = completion;
         
-
-        self.centralManagerDelegate = self.centralManager.delegate;
-        self.centralManager.delegate = self;
-        
+        __weak BLEConnectPeripheralOperation * weakSelf = self;
+        self.errorCallback = ^(NSError * error) {
+            [weakSelf callbackWithError: error];
+        };
     }
     
     return self;
 }
 
-//**************************************************************************************************
-- (void) dealloc
-{
-    self.centralManager.delegate = self.centralManagerDelegate;
-}
 
 
 //**************************************************************************************************
@@ -58,7 +53,7 @@
 {
     if (self.peripheral.state == CBPeripheralStateConnected)
     {
-        self.callback(nil);
+        [self callbackWithError: nil];
     }
     else
     {
@@ -73,10 +68,19 @@
 }
 
 //**************************************************************************************************
+- (void) callbackWithError: (NSError *) error
+{
+    if (self.callback)
+    {
+        self.callback(error);
+    }
+}
+
+//**************************************************************************************************
 - (void) centralManager: (CBCentralManager *) central didConnectPeripheral: (CBPeripheral *) peripheral
 {
     [self finishWithCompletion:^{
-        self.callback(nil);
+        [self callbackWithError: nil];
     }];
 }
 
@@ -85,15 +89,10 @@
                   error: (NSError *) error
 {
     [self finishWithCompletion:^{
-        self.callback(error);
+        [self callbackWithError: error];
     }];
 }
 
-//**************************************************************************************************
-- (void) callbackWithError: (NSError *) error
-{
-    self.callback(error);
-}
 
 //**************************************************************************************************
 - (BOOL) shouldTimeOut
@@ -104,7 +103,7 @@
 //**************************************************************************************************
 - (BOOL) shouldCancelConnectionOnTimeout
 {
-    return  YES;
+    return YES;
 }
 
 

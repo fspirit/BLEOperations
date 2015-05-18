@@ -65,11 +65,11 @@ const NSTimeInterval kDefaultConnectTimeout = 10.0;
                                                             peripheral: peripheral
                                                                timeout: kDefaultConnectTimeout
                                                             completion: ^(NSError * error) {
+                                                                [self.operations removeObject: op];
                                                                 if (completion)
                                                                 {
                                                                     completion(error);
                                                                 }
-                                                                [self.operations removeObject: op];
                                                             }];
     [self startOperation: op];
 }
@@ -95,11 +95,11 @@ const NSTimeInterval kDefaultConnectTimeout = 10.0;
                                                          timeout: kDefaultTimeout
                                                      serviceUuid: serviceUuid
                                                       completion: ^(CBService * service, NSError * error) {
-                                                          if (completion)
-                                                          {
-                                                             completion(service, error);
-                                                          }
-                                                          [self.operations removeObject: op];
+                                                            [self.operations removeObject: op];
+                                                            if (completion)
+                                                            {
+                                                                completion(service, error);
+                                                            }
                                                       }];
     
     [self startOperation: op];
@@ -128,11 +128,12 @@ const NSTimeInterval kDefaultConnectTimeout = 10.0;
                                                                 service: service
                                                      characteristicUuid: serviceUuid
                                                              completion: ^(CBCharacteristic * characteristic, NSError * error) {
+                                                                 [self.operations removeObject: op];
                                                                  if (completion)
                                                                  {
                                                                      completion(characteristic, error);
                                                                  }
-                                                                 [self.operations removeObject: op];
+
                                                              }];
     
     [self startOperation: op];
@@ -159,11 +160,12 @@ const NSTimeInterval kDefaultConnectTimeout = 10.0;
                                                                 timeout: kDefaultTimeout
                                                          characteristic: characteristic
                                                              completion: ^(NSData * value, NSError * error) {
+                                                                 [self.operations removeObject: op];
                                                                  if (completion)
                                                                  {
                                                                      completion(value, error);
                                                                  }
-                                                                 [self.operations removeObject: op];
+
                                                              }];
     [self startOperation: op];
 }
@@ -191,11 +193,12 @@ const NSTimeInterval kDefaultConnectTimeout = 10.0;
                                                           characteristic: characteristic
                                                                     data: data
                                                               completion: ^(NSError * error) {
+                                                                  [self.operations removeObject: op];
                                                                   if (completion)
                                                                   {
                                                                     completion(error);
                                                                   }
-                                                                  [self.operations removeObject: op];
+                                                                  
                                                               }];
     [self startOperation: op];
 }
@@ -217,17 +220,18 @@ const NSTimeInterval kDefaultConnectTimeout = 10.0;
     }
     
     __block BLECompoundReadOperation * op = nil;
-    op = [[BLECompoundReadOperation alloc] initWithCentralManager: self.centralManager
-                                                       peripheral: peripheral
-                                                      serviceUuid: serviceUuid
-                                               characteristicUuid: characteristicUuid
-                                                       completion: ^(NSData *value, NSError *error) {
-                                                           if (completion)
-                                                           {
-                                                               completion(value, error);
-                                                           }
-                                                           [self.operations removeObject: op];
-                                                       }];
+    op = [[BLECompoundReadOperation alloc] initWithOperationsManager: self
+                                                          peripheral: peripheral
+                                                         serviceUuid: serviceUuid
+                                                  characteristicUuid: characteristicUuid
+                                                          completion: ^(NSData *value, NSError *error) {
+                                                              [self.operations removeObject: op];
+                                                              if (completion)
+                                                              {
+                                                                  completion(value, error);
+                                                              }
+                                                              
+                                                          }];
     [self startOperation: op];
 }
 
@@ -248,18 +252,18 @@ const NSTimeInterval kDefaultConnectTimeout = 10.0;
     }
     
     __block BLECompoundWriteOperation * op = nil;
-    op = [[BLECompoundWriteOperation alloc] initWithCentralManager: self.centralManager
-                                                        peripheral: peripheral
-                                                       serviceUuid: serviceUuid
-                                                characteristicUuid: characteristicUuid
-                                                              data: data
-                                                        completion: ^(NSError *error) {
-                                                            if (completion)
-                                                            {
-                                                                completion(error);
-                                                            }
-                                                            [self.operations removeObject: op];
-                                                        }];
+    op = [[BLECompoundWriteOperation alloc] initWithOperationsManager: self
+                                                           peripheral: peripheral
+                                                          serviceUuid: serviceUuid
+                                                   characteristicUuid: characteristicUuid
+                                                                 data: data
+                                                           completion: ^(NSError *error) {
+                                                               [self.operations removeObject: op];
+                                                               if (completion)
+                                                               {
+                                                                    completion(error);
+                                                               }                                                               
+                                                           }];
     [self startOperation: op];
 }
 

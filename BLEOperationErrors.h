@@ -30,10 +30,6 @@ extern const NSInteger kBLEOperationErrorCharacteristicNotFound;
 + (NSError *) peripheralDidDisconnectError;
 + (NSError *) serviceNotFoundError;
 + (NSError *) characteristicNotFoundError;
-+ (NSError *) unableToStartFindServiceOpError;
-+ (NSError *) unableToStartFindCharacteristicOpError;
-+ (NSError *) unableToStartReadCharacteristicOpError;
-+ (NSError *) unableToStartWriteCharacteristicOpError;
 
 @end
 

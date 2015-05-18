@@ -11,6 +11,7 @@
 #import <CoreBluetooth/CoreBluetooth.h>
 
 typedef void(^BLEOperationCompletion)(void);
+typedef void(^BLEOperationErrorCallback)(NSError * error);
 
 @interface BLEOperation () <CBCentralManagerDelegate>
 
@@ -22,7 +23,9 @@ typedef void(^BLEOperationCompletion)(void);
 @property CBPeripheral * peripheral;
 @property (assign) NSTimeInterval timeout;
 
-- (void) callbackWithError: (NSError *) error;
+@property (copy) BLEOperationErrorCallback errorCallback;
+
+- (void) failWithError: (NSError *) error;
 
 - (void) startTimeoutHandler;
 - (BOOL) stopTimeoutHandler;

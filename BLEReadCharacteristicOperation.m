@@ -49,7 +49,11 @@
         self.callback = completion;
         self.characteristic = characteristic;
         
-        self.peripheral.delegate = self;
+        __weak BLEReadCharacteristicOperation * weakSelf = self;
+        self.errorCallback = ^(NSError * error) {
+            
+            [weakSelf callbackWithError: error result: nil];
+        };
     }
     
     return self;
@@ -57,15 +61,12 @@
 }
 
 //**************************************************************************************************
-- (void) dealloc
+- (void) callbackWithError: (NSError *) error result: (NSData *) result
 {
-    self.peripheral.delegate = nil;
-}
-
-//**************************************************************************************************
-- (void) callbackWithError: (NSError *) error
-{
-    self.callback(nil, error);
+    if (self.callback)
+    {
+        self.callback(result, error);
+    }
 }
 
 //**************************************************************************************************
@@ -77,23 +78,17 @@
 
 
 //**************************************************************************************************
-- (BOOL) shouldCancelConnectionOnTimeout
-{
-    return NO;
-}
-
-//**************************************************************************************************
 - (void) peripheral: (CBPeripheral *) peripheral didUpdateValueForCharacteristic: (CBCharacteristic *) characteristic
               error: (NSError *) error
 {
     [self finishWithCompletion:^{
-        if (error != nil)
+        if (error)
         {
-            self.callback(nil, error);
+            [self callbackWithError: error result: nil];
         }
         else
         {
-            self.callback(characteristic.value, nil);
+            [self callbackWithError: nil result: characteristic.value];
         }
     }];
 }

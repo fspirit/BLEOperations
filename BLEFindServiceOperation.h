@@ -8,11 +8,11 @@
 
 #import <Foundation/Foundation.h>
 
-#import "BLEOperation_Protected.h"
+#import "BLEConnectedOperation.h"
 
 typedef void(^BLEFindServiceOperationCallback)(CBService * service, NSError * error);
 
-@interface BLEFindServiceOperation : BLEOperation
+@interface BLEFindServiceOperation : BLEConnectedOperation
 
 - (instancetype) initWithCentralManager: (CBCentralManager *) centralManager
                              peripheral: (CBPeripheral *) peripheral

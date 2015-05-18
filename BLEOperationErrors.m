@@ -13,10 +13,6 @@ NSString * const kBLEOperationErrorDomain = @"com.forcecube.BLEOperations.ErrorD
 const NSInteger kBLEOperationErrorTimedOut = 0;
 const NSInteger kBLEOperationErrorBLEIsUnavailable = 3;
 const NSInteger kBLEOperationErrorPeripheralDidDisconnect = 4;
-const NSInteger kBLEOperationErrorUnableToStartFindServiceOp = 5;
-const NSInteger kBLEOperationErrorUnableToStartFindCharacteristicOp = 6;
-const NSInteger kBLEOperationErrorUnableToStartReadCharacteristicOp = 7;
-const NSInteger kBLEOperationErrorUnableToStartWriteCharacteristicOp = 8;
 const NSInteger kBLEOperationErrorServiceNotFound = 9;
 const NSInteger kBLEOperationErrorCharacteristicNotFound = 10;
 
@@ -31,7 +27,7 @@ static NSDictionary * codeToMessageMap;
                           @(kBLEOperationErrorBLEIsUnavailable):
                               @"Bluetooth is unavailable",
                           @(kBLEOperationErrorPeripheralDidDisconnect):
-                              @"Peropheral did disconnect during operation",
+                              @"Peripheral did disconnect during operation",
                           @(kBLEOperationErrorServiceNotFound):
                               @"Unable to find target service on peripheral",
                           @(kBLEOperationErrorCharacteristicNotFound):
@@ -56,30 +52,6 @@ static NSDictionary * codeToMessageMap;
 + (NSError *) characteristicNotFoundError
 {
     return [self errorWithCode: kBLEOperationErrorCharacteristicNotFound];
-}
-
-//**************************************************************************************************
-+ (NSError *) unableToStartFindServiceOpError
-{
-    return [self errorWithCode: kBLEOperationErrorUnableToStartFindServiceOp];
-}
-
-//**************************************************************************************************
-+ (NSError *) unableToStartFindCharacteristicOpError
-{
-    return [self errorWithCode: kBLEOperationErrorUnableToStartFindCharacteristicOp];
-}
-
-//**************************************************************************************************
-+ (NSError *) unableToStartReadCharacteristicOpError
-{
-    return [self errorWithCode: kBLEOperationErrorUnableToStartReadCharacteristicOp];
-}
-
-//**************************************************************************************************
-+ (NSError *) unableToStartWriteCharacteristicOpError
-{
-    return [self errorWithCode: kBLEOperationErrorUnableToStartWriteCharacteristicOp];
 }
 
 //**************************************************************************************************

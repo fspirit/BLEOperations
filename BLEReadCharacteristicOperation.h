@@ -6,11 +6,11 @@
 //  Copyright (c) 2015 Stanislav Olekhnovich. All rights reserved.
 //
 
-#import "BLEOperation_Protected.h"
+#import "BLEConnectedOperation.h"
 
 typedef void (^BLEReadCharacteristicOperationCallback)(NSData * value, NSError * error);
 
-@interface BLEReadCharacteristicOperation : BLEOperation
+@interface BLEReadCharacteristicOperation : BLEConnectedOperation
 
 - (instancetype) initWithCentralManager: (CBCentralManager *) centralManager
                              peripheral: (CBPeripheral *) peripheral

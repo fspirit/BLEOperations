@@ -47,22 +47,22 @@
         self.callback = completion;
         self.serviceUuid = serviceUuid;
         
-        self.peripheral.delegate = self;
+        __weak BLEFindServiceOperation * weakSelf = self;
+        self.errorCallback = ^(NSError * error){
+            [weakSelf callbackWithError: error result: nil];
+        };
     }
     
     return self;
 }
 
 //**************************************************************************************************
-- (void) dealloc
+- (void) callbackWithError: (NSError *) error result: (CBService *) service
 {
-    self.peripheral.delegate = nil;
-}
-
-//**************************************************************************************************
-- (void) callbackWithError: (NSError *) error
-{
-    self.callback(nil, error);
+    if (self.callback)
+    {
+        self.callback(service, error);
+    }
 }
 
 //**************************************************************************************************
@@ -72,7 +72,7 @@
 
     if (sv != nil)
     {
-        self.callback(sv, nil);
+        [self callbackWithError: nil result: sv];
         return;
     }
     
@@ -108,24 +108,17 @@
 - (void) peripheral: (CBPeripheral *) peripheral didDiscoverServices: (NSError *) error
 {
     [self finishWithCompletion:^{
-        if (error != nil)
+        if (error)
         {
-            self.callback(nil, error);
+            [self callbackWithError: error result: nil];
         }
         else
         {
             CBService * service = [self serviceWithUuid: self.serviceUuid
                                          fromPeripheral: self.peripheral];
-            self.callback(service, nil);
+            [self callbackWithError: nil result: service];
         }
     }];
-}
-
-
-//**************************************************************************************************
-- (BOOL) shouldCancelConnectionOnTimeout
-{
-    return NO;
 }
 
 @end

@@ -56,7 +56,10 @@
         self.characteristic = characteristic;
         self.dataToWrite = data;
         
-        self.peripheral.delegate = self;
+        __weak BLEWriteCharacteristicOperation * weakSelf = self;
+        self.errorCallback = ^(NSError * error) {
+            [weakSelf callbackWithError: error];
+        };
     }
     
     
@@ -64,15 +67,12 @@
 }
 
 //**************************************************************************************************
-- (void) dealloc
-{
-    self.peripheral.delegate = nil;
-}
-
-//**************************************************************************************************
 - (void) callbackWithError: (NSError *) error
 {
-    self.callback(error);
+    if (self.callback)
+    {
+        self.callback(error);
+    }
 }
 
 //**************************************************************************************************
@@ -96,14 +96,7 @@
               error: (NSError *)error
 {
     [self finishWithCompletion:^{
-        if (error != nil)
-        {
-            self.callback(error);
-        }
-        else
-        {
-            self.callback(nil);
-        }
+        [self callbackWithError: error];
     }];
 }
 

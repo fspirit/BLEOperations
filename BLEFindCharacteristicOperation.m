@@ -54,22 +54,22 @@
         self.characteristicUuid = characteristicUuid;
         self.service = service;
         
-        self.peripheral.delegate = self;
+        __weak BLEFindCharacteristicOperation * weakSelf = self;
+        self.errorCallback = ^(NSError * error) {
+            [weakSelf callbackWithError: error result: nil];
+        };
     }
     
     return self;
 }
 
 //**************************************************************************************************
-- (void) dealloc
+- (void) callbackWithError: (NSError *) error result: (CBCharacteristic *) result
 {
-    self.peripheral.delegate = nil;
-}
-
-//**************************************************************************************************
-- (void) callbackWithError: (NSError *) error
-{
-    self.callback(nil, error);
+    if (self.callback)
+    {
+        self.callback(result, error);
+    }
 }
 
 //**************************************************************************************************
@@ -79,12 +79,13 @@
                                              fromService: self.service];
     if (ch != nil)
     {
-        self.callback(ch, nil);
+        [self callbackWithError: nil result: ch];
         return;
     }
     
     [self startTimeoutHandler];
-    [self.peripheral discoverCharacteristics: @[ self.characteristicUuid ] forService: self.service];
+    [self.peripheral discoverCharacteristics: @[ self.characteristicUuid ]
+                                  forService: self.service];
 }
 
 //**************************************************************************************************
@@ -108,23 +109,17 @@
               error: (NSError *) error
 {
     [self finishWithCompletion:^{
-        if (error != nil)
+        if (error)
         {
-            self.callback(nil, error);
+            [self callbackWithError: error result: nil];
         }
         else
         {
             CBCharacteristic * ch = [self characteristicWithUuid: self.characteristicUuid
                                                     fromService: service];
-            self.callback(ch, nil);
+            [self callbackWithError: nil result: ch];
         }
     }];
-}
-
-//**************************************************************************************************
-- (BOOL) shouldCancelConnectionOnTimeout
-{
-    return NO;
 }
 
 
