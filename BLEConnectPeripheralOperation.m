@@ -15,8 +15,9 @@
 
 @property (copy) BLEConnectPeripheralOperationCallback callback;
 
-
 @end
+
+#pragma GCC diagnostic ignored "-Wincomplete-implementation"
 
 @implementation BLEConnectPeripheralOperation
 
@@ -35,6 +36,7 @@
     
     if (self)
     {
+        
         self.callback = completion;
         
         __weak BLEConnectPeripheralOperation * weakSelf = self;

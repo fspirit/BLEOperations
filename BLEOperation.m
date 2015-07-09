@@ -16,6 +16,7 @@
 
 @end
 
+#pragma GCC diagnostic ignored "-Wincomplete-implementation"
 @implementation BLEOperation
 
 //**************************************************************************************************
@@ -130,12 +131,12 @@
 //**************************************************************************************************
 - (void) failWithError: (NSError *) error
 {
-    if (self.errorCallback)
+    if (self.errorCallback != nil)
     {
         BLEOperationErrorCallback callback = self.errorCallback;
         self.errorCallback = nil;
         
-        callback(error);
+        callback(error);        
     }
 }
 

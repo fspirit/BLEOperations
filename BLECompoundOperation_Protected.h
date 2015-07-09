@@ -22,8 +22,10 @@
 @property CBUUID * serviceUuid;
 @property CBUUID * characteristicUuid;
 @property BLEOperationsManager * operationsManager;
+@property BOOL didConnectToPeripheral;
 
 - (void) failWithError: (NSError *) error;
 - (void) handleCharacteristic: (CBCharacteristic *) characteristic;
+- (void) finishOperation;
 
 @end

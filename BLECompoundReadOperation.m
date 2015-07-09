@@ -15,6 +15,8 @@
 
 @end
 
+#pragma GCC diagnostic ignored "-Wincomplete-implementation"
+
 @implementation BLECompoundReadOperation
 
 #pragma mark - Lifecycle
@@ -44,10 +46,12 @@
 //**************************************************************************************************
 - (void) failWithError: (NSError *) error
 {
+    [self finishOperation];
     if (self.callback)
     {
         self.callback(nil, error);
     }
+
 }
 
 //**************************************************************************************************
@@ -56,6 +60,7 @@
     [self.operationsManager readValueOfCharacteristic: characteristic
                                          onPeripheral: self.peripheral
                                            completion: ^(NSData *value, NSError *error) {
+                                               [self finishOperation];
                                                if(!self.callback)
                                                {
                                                    return;
@@ -68,6 +73,7 @@
                                                {
                                                    self.callback(value, nil);
                                                }
+
                                             }];
 }
 

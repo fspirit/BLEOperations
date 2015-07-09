@@ -18,6 +18,7 @@
 
 @implementation BLECompoundWriteOperation
 
+//**************************************************************************************************
 - (instancetype) initWithOperationsManager: (BLEOperationsManager *) operationsManager
                                 peripheral: (CBPeripheral *) peripheral
                                serviceUuid: (CBUUID *) serviceUuid
@@ -25,10 +26,7 @@
                                       data: (NSData *) data
                                 completion: (BLEWriteCharacteristicOperationCallback) completion
 {
-    if (!data)
-    {
-        return nil;
-    }
+    NSParameterAssert(data != nil);
     
     self = [super initWithOperationsManager: operationsManager
                                  peripheral: peripheral
@@ -47,6 +45,7 @@
 //**************************************************************************************************
 - (void) failWithError: (NSError *) error
 {
+    [self finishOperation];
     self.callback(error);
 }
 
@@ -56,7 +55,10 @@
     [self.operationsManager writeValue: self.data
                       toCharacteristic: characteristic
                           onPeripheral: self.peripheral
-                            completion: self.callback];
+                            completion: ^(NSError * error) {
+                                [self finishOperation];
+                                self.callback(error);
+                            }];
 }
 
 @end

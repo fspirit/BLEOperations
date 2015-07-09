@@ -45,6 +45,13 @@
 }
 
 //**************************************************************************************************
+- (void) finishWithCompletion: (BLEOperationCompletion) completion
+{
+    self.peripheral.delegate = nil;
+    [super finishWithCompletion: completion];
+}
+
+//**************************************************************************************************
 - (BOOL) shouldCancelConnectionOnTimeout
 {
     return NO;

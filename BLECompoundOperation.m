@@ -12,6 +12,14 @@
 
 #import <CoreBluetooth/CoreBluetooth.h>
 
+@interface BLECompoundOperation ()
+
+@property (assign) id<CBCentralManagerDelegate> centralDelegate;
+
+@end
+
+#pragma GCC diagnostic ignored "-Wincomplete-implementation"
+
 @implementation BLECompoundOperation
 
 //**************************************************************************************************
@@ -30,6 +38,7 @@
     if (self)
     {
         self.operationsManager = operationsManager;
+        self.centralManager = operationsManager.centralManager;
         self.peripheral = peripheral;
         self.serviceUuid = serviceUuid;
         self.characteristicUuid = characteristicUuid;
@@ -43,7 +52,27 @@
 //**************************************************************************************************
 - (void) start
 {
-    [self findService];
+    self.centralDelegate = self.centralManager.delegate;
+    
+    if (self.peripheral.state != CBPeripheralStateConnected)
+    {
+        [self.operationsManager connectToPeripheral: self.peripheral completion: ^(NSError *error) {
+            if (error)
+            {
+                [self failWithError: error];
+            }
+            else
+            {
+                self.didConnectToPeripheral = YES;
+                [self findService];
+            }
+        }];
+    }
+    else
+    {
+        self.didConnectToPeripheral = NO;
+        [self findService];
+    }
 }
 
 //**************************************************************************************************
@@ -87,6 +116,17 @@
                                                     [self handleCharacteristic: characteristic];
                                                 }
                                             }];
+}
+
+//**************************************************************************************************
+- (void) finishOperation
+{
+    if (self.didConnectToPeripheral == YES)
+    {
+        [self.centralManager cancelPeripheralConnection: self.peripheral];
+    }
+    
+    self.centralManager.delegate = self.centralDelegate;
 }
 
 @end

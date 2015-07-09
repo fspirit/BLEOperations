@@ -14,7 +14,7 @@
 const NSTimeInterval kDefaultTimeout = 4.0;
 const NSTimeInterval kDefaultConnectTimeout = 10.0;
 
-@interface BLEOperationsManager () <CBCentralManagerDelegate>
+@interface BLEOperationsManager ()
 
 @property CBCentralManager * centralManager;
 @property NSMutableSet * operations;
@@ -28,11 +28,7 @@ const NSTimeInterval kDefaultConnectTimeout = 10.0;
 //**************************************************************************************************
 - (instancetype) initWithCentralManager: (CBCentralManager *) centralManager
 {
-    
-    if (centralManager == nil)
-    {
-        return nil;
-    }
+    NSParameterAssert(centralManager != nil);
     
     self = [super init];
     
@@ -50,15 +46,9 @@ const NSTimeInterval kDefaultConnectTimeout = 10.0;
 - (void) connectToPeripheral: (CBPeripheral *) peripheral
                   completion: (BLEConnectPeripheralOperationCallback) completion
 {
-    if (self.centralManager.state != CBCentralManagerStatePoweredOn)
-    {
-        return;
-    }
+    [self checkCentralManagerIsPoweredOn];
     
-    if (peripheral == nil)
-    {
-        return;
-    }
+    NSParameterAssert(peripheral != nil);
     
     __block BLEConnectPeripheralOperation * op = nil;
     op = [[BLEConnectPeripheralOperation alloc] initWithCentralManager: self.centralManager
@@ -79,15 +69,10 @@ const NSTimeInterval kDefaultConnectTimeout = 10.0;
                 onPeripheral: (CBPeripheral *) peripheral
                   completion: (BLEFindServiceOperationCallback) completion
 {
-    if (self.centralManager.state != CBCentralManagerStatePoweredOn)
-    {
-        return;
-    }
+    [self checkCentralManagerIsPoweredOn];
     
-    if (!serviceUuid || !peripheral)
-    {
-        return;
-    }
+    NSParameterAssert(serviceUuid != nil);
+    NSParameterAssert(peripheral != nil);
     
     __block BLEFindServiceOperation * op = nil;
     op = [[BLEFindServiceOperation alloc] initWithCentralManager: self.centralManager
@@ -111,20 +96,16 @@ const NSTimeInterval kDefaultConnectTimeout = 10.0;
                        onPeripheral: (CBPeripheral *) peripheral
                          completion: (BLEFindCharacteristicOperationCallback) completion
 {
-    if (self.centralManager.state != CBCentralManagerStatePoweredOn)
-    {
-        return;
-    }
+    [self checkCentralManagerIsPoweredOn];
     
-    if (!serviceUuid || !service || !peripheral)
-    {
-        return;
-    }
+    NSParameterAssert(serviceUuid != nil);
+    NSParameterAssert(service != nil);
+    NSParameterAssert(peripheral != nil);
     
     __block BLEFindCharacteristicOperation * op = nil;
     op = [[BLEFindCharacteristicOperation alloc] initWithCentralManager: self.centralManager
                                                              peripheral: peripheral
-                                                                timeout: kDefaultTimeout
+                                                                timeout: kDefaultConnectTimeout
                                                                 service: service
                                                      characteristicUuid: serviceUuid
                                                              completion: ^(CBCharacteristic * characteristic, NSError * error) {
@@ -144,15 +125,10 @@ const NSTimeInterval kDefaultConnectTimeout = 10.0;
                       onPeripheral: (CBPeripheral *) peripheral
                         completion: (BLEReadCharacteristicOperationCallback) completion
 {
-    if (self.centralManager.state != CBCentralManagerStatePoweredOn)
-    {
-        return;
-    }
+    [self checkCentralManagerIsPoweredOn];
     
-    if (!characteristic || !peripheral)
-    {
-        return;
-    }
+    NSParameterAssert(characteristic != nil);
+    NSParameterAssert(peripheral != nil);
     
     __block BLEReadCharacteristicOperation * op = nil;
     op = [[BLEReadCharacteristicOperation alloc] initWithCentralManager: self.centralManager
@@ -176,15 +152,11 @@ const NSTimeInterval kDefaultConnectTimeout = 10.0;
        onPeripheral: (CBPeripheral *) peripheral
          completion: (BLEWriteCharacteristicOperationCallback) completion
 {
-    if (self.centralManager.state != CBCentralManagerStatePoweredOn)
-    {
-        return;
-    }
+    [self checkCentralManagerIsPoweredOn];
     
-    if (!data || !characteristic || !peripheral)
-    {
-        return;
-    }
+    NSParameterAssert(data != nil);
+    NSParameterAssert(characteristic != nil);
+    NSParameterAssert(peripheral != nil);
     
     __block BLEWriteCharacteristicOperation * op = nil;
     op = [[BLEWriteCharacteristicOperation alloc] initWithCentralManager: self.centralManager
@@ -209,15 +181,11 @@ const NSTimeInterval kDefaultConnectTimeout = 10.0;
                               onPeripheral: (CBPeripheral *) peripheral
                                 completion: (BLEReadCharacteristicOperationCallback) completion
 {
-    if (self.centralManager.state != CBCentralManagerStatePoweredOn)
-    {
-        return;
-    }
+    [self checkCentralManagerIsPoweredOn];
     
-    if (!characteristicUuid || !serviceUuid || !peripheral)
-    {
-        return;
-    }
+    NSParameterAssert(characteristicUuid != nil);
+    NSParameterAssert(serviceUuid != nil);
+    NSParameterAssert(peripheral != nil);
     
     __block BLECompoundReadOperation * op = nil;
     op = [[BLECompoundReadOperation alloc] initWithOperationsManager: self
@@ -241,15 +209,12 @@ const NSTimeInterval kDefaultConnectTimeout = 10.0;
        onPeripheral: (CBPeripheral *) peripheral
          completion: (BLEWriteCharacteristicOperationCallback) completion
 {
-    if (self.centralManager.state != CBCentralManagerStatePoweredOn)
-    {
-        return;
-    }
+    [self checkCentralManagerIsPoweredOn];
     
-    if (!data || !characteristicUuid || !serviceUuid || !peripheral)
-    {
-        return;
-    }
+    NSParameterAssert(data != nil);
+    NSParameterAssert(characteristicUuid != nil);
+    NSParameterAssert(serviceUuid != nil);
+    NSParameterAssert(peripheral != nil);
     
     __block BLECompoundWriteOperation * op = nil;
     op = [[BLECompoundWriteOperation alloc] initWithOperationsManager: self
@@ -268,6 +233,17 @@ const NSTimeInterval kDefaultConnectTimeout = 10.0;
 }
 
 #pragma mark - Private
+
+//**************************************************************************************************
+- (void) checkCentralManagerIsPoweredOn
+{
+    if (self.centralManager.state != CBCentralManagerStatePoweredOn)
+    {
+        @throw  [NSException exceptionWithName: NSInternalInconsistencyException
+                                        reason: @"CBCentralManager instance is not in PoweredOn state"
+                                      userInfo: nil];
+    }
+}
 
 //**************************************************************************************************
 - (void) startOperation: (id<BLEOperationProtocol>) op
