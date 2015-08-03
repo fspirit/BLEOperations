@@ -19,9 +19,6 @@ extern const NSInteger kBLEOperationErrorUnableToStartReadCharacteristicOp;
 extern const NSInteger kBLEOperationErrorUnableToStartWriteCharacteristicOp;
 extern const NSInteger kBLEOperationErrorServiceNotFound;
 extern const NSInteger kBLEOperationErrorCharacteristicNotFound;
-//extern const NSInteger kBLEOperationErrorPeripheralIsNil;
-//extern const NSInteger kBLEOperationErrorCentralManagerIsNil;
-//extern const NSInteger kBLEOperationErrorServiceIsNil;
 
 @interface BLEOperationErrors : NSObject
 
