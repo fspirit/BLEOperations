@@ -46,7 +46,10 @@ const NSTimeInterval kDefaultConnectTimeout = 10.0;
 - (void) connectToPeripheral: (CBPeripheral *) peripheral
                   completion: (BLEConnectPeripheralOperationCallback) completion
 {
-    [self checkCentralManagerIsPoweredOn];
+    if (self.centralManager.state != CBCentralManagerStatePoweredOn)
+    {
+        return;
+    }
     
     NSParameterAssert(peripheral != nil);
     
@@ -69,7 +72,10 @@ const NSTimeInterval kDefaultConnectTimeout = 10.0;
                 onPeripheral: (CBPeripheral *) peripheral
                   completion: (BLEFindServiceOperationCallback) completion
 {
-    [self checkCentralManagerIsPoweredOn];
+    if (self.centralManager.state != CBCentralManagerStatePoweredOn)
+    {
+        return;
+    }
     
     NSParameterAssert(serviceUuid != nil);
     NSParameterAssert(peripheral != nil);
@@ -96,7 +102,10 @@ const NSTimeInterval kDefaultConnectTimeout = 10.0;
                        onPeripheral: (CBPeripheral *) peripheral
                          completion: (BLEFindCharacteristicOperationCallback) completion
 {
-    [self checkCentralManagerIsPoweredOn];
+    if (self.centralManager.state != CBCentralManagerStatePoweredOn)
+    {
+        return;
+    }
     
     NSParameterAssert(serviceUuid != nil);
     NSParameterAssert(service != nil);
@@ -125,7 +134,10 @@ const NSTimeInterval kDefaultConnectTimeout = 10.0;
                       onPeripheral: (CBPeripheral *) peripheral
                         completion: (BLEReadCharacteristicOperationCallback) completion
 {
-    [self checkCentralManagerIsPoweredOn];
+    if (self.centralManager.state != CBCentralManagerStatePoweredOn)
+    {
+        return;
+    }
     
     NSParameterAssert(characteristic != nil);
     NSParameterAssert(peripheral != nil);
@@ -152,7 +164,10 @@ const NSTimeInterval kDefaultConnectTimeout = 10.0;
        onPeripheral: (CBPeripheral *) peripheral
          completion: (BLEWriteCharacteristicOperationCallback) completion
 {
-    [self checkCentralManagerIsPoweredOn];
+    if (self.centralManager.state != CBCentralManagerStatePoweredOn)
+    {
+        return;
+    }
     
     NSParameterAssert(data != nil);
     NSParameterAssert(characteristic != nil);
@@ -181,7 +196,10 @@ const NSTimeInterval kDefaultConnectTimeout = 10.0;
                               onPeripheral: (CBPeripheral *) peripheral
                                 completion: (BLEReadCharacteristicOperationCallback) completion
 {
-    [self checkCentralManagerIsPoweredOn];
+    if (self.centralManager.state != CBCentralManagerStatePoweredOn)
+    {
+        return;
+    }
     
     NSParameterAssert(characteristicUuid != nil);
     NSParameterAssert(serviceUuid != nil);
@@ -209,7 +227,10 @@ const NSTimeInterval kDefaultConnectTimeout = 10.0;
        onPeripheral: (CBPeripheral *) peripheral
          completion: (BLEWriteCharacteristicOperationCallback) completion
 {
-    [self checkCentralManagerIsPoweredOn];
+    if (self.centralManager.state != CBCentralManagerStatePoweredOn)
+    {
+        return;
+    }
     
     NSParameterAssert(data != nil);
     NSParameterAssert(characteristicUuid != nil);
@@ -234,16 +255,6 @@ const NSTimeInterval kDefaultConnectTimeout = 10.0;
 
 #pragma mark - Private
 
-//**************************************************************************************************
-- (void) checkCentralManagerIsPoweredOn
-{
-    if (self.centralManager.state != CBCentralManagerStatePoweredOn)
-    {
-        @throw  [NSException exceptionWithName: NSInternalInconsistencyException
-                                        reason: @"CBCentralManager instance is not in PoweredOn state"
-                                      userInfo: nil];
-    }
-}
 
 //**************************************************************************************************
 - (void) startOperation: (id<BLEOperationProtocol>) op
