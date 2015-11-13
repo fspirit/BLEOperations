@@ -57,8 +57,6 @@
 //**************************************************************************************************
 - (void) startTimeoutHandler
 {
-    NSLog(@"Starting timeout handler %@", self);
-    
     self.didTimedOut = NO;
     
     [self performSelector: @selector(timeoutHandlerDidFire)
@@ -69,8 +67,6 @@
 //**************************************************************************************************
 - (BOOL) stopTimeoutHandler
 {
-    NSLog(@"Stopping timeout handler %@", self);
-    
     if (self.didTimedOut == YES)
     {
         return NO;
