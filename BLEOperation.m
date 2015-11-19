@@ -13,6 +13,7 @@
 @interface BLEOperation () <CBCentralManagerDelegate>
 
 @property (assign) BOOL didTimedOut;
+@property NSTimer * timeoutTimer;
 
 @end
 
@@ -32,7 +33,6 @@
     {
         return nil;
     }
-
     if (timeout <= 0)
     {
         return nil;
@@ -59,9 +59,11 @@
 {
     self.didTimedOut = NO;
     
-    [self performSelector: @selector(timeoutHandlerDidFire)
-               withObject: nil
-               afterDelay: self.timeout];
+    self.timeoutTimer = [NSTimer scheduledTimerWithTimeInterval: self.timeout
+                                                         target: self
+                                                       selector: @selector(timeoutHandlerDidFire)
+                                                       userInfo: nil
+                                                        repeats: NO];
 }
 
 //**************************************************************************************************
@@ -72,9 +74,9 @@
         return NO;
     }
     
-    [NSObject cancelPreviousPerformRequestsWithTarget: self
-                                             selector: @selector(timeoutHandlerDidFire)
-                                               object: nil];
+    [self.timeoutTimer invalidate];
+    self.timeoutTimer = nil;
+
     self.didTimedOut = YES;
     
     return YES;

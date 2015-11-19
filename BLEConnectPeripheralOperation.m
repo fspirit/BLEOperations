@@ -53,19 +53,16 @@
 //**************************************************************************************************
 - (void) execute
 {
-    if (self.peripheral.state == CBPeripheralStateConnected)
+    if (self.peripheral.state == CBPeripheralStateConnected ||
+        self.peripheral.state == CBPeripheralStateConnecting)
     {
         [self callbackWithError: nil];
     }
     else
     {
         [self startTimeoutHandler];
-        if (self.peripheral.state == CBPeripheralStateDisconnected)
-        {
-            [self.centralManager connectPeripheral: self.peripheral
-                                           options: nil];
-        }
-        
+        [self.centralManager connectPeripheral: self.peripheral
+                                       options: nil];
     }
 }
 
