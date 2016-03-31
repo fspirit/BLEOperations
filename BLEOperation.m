@@ -155,7 +155,12 @@ didDisconnectPeripheral: (CBPeripheral *) peripheral
     [self failWithError: error];
 }
 
-
+//**************************************************************************************************
+- (void) centralManager: (CBCentralManager *) central
+  didDiscoverPeripheral: (CBPeripheral *) peripheral
+      advertisementData: (NSDictionary *) advertisementData
+                   RSSI: (NSNumber *) RSSI
+{}
 
 
 @end
