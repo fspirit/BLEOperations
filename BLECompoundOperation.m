@@ -12,12 +12,6 @@
 
 #import <CoreBluetooth/CoreBluetooth.h>
 
-@interface BLECompoundOperation ()
-
-@property (assign) id<CBCentralManagerDelegate> centralDelegate;
-
-@end
-
 #pragma GCC diagnostic ignored "-Wincomplete-implementation"
 
 @implementation BLECompoundOperation
@@ -52,8 +46,6 @@
 //**************************************************************************************************
 - (void) start
 {
-    self.centralDelegate = self.centralManager.delegate;
-    
     if (self.peripheral.state != CBPeripheralStateConnected)
     {
         [self.operationsManager connectToPeripheral: self.peripheral completion: ^(NSError *error) {
@@ -124,9 +116,7 @@
     if (self.didConnectToPeripheral == YES)
     {
         [self.centralManager cancelPeripheralConnection: self.peripheral];
-    }
-    
-    self.centralManager.delegate = self.centralDelegate;
+    }        
 }
 
 @end

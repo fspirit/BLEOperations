@@ -60,9 +60,7 @@
 - (void) callbackWithError: (NSError *) error result: (CBService *) service
 {
     if (self.callback)
-    {
         self.callback(service, error);
-    }
 }
 
 //**************************************************************************************************
@@ -72,21 +70,22 @@
 
     if (sv != nil)
     {
-        [self callbackWithError: nil result: sv];
+        __weak BLEFindServiceOperation * weakSelf = self;
+        [self finishWithCompletion:^{
+            [weakSelf callbackWithError: nil result: sv];
+        }];
         return;
     }
     
     [self startTimeoutHandler];
-    [self.peripheral discoverServices: @[ self.serviceUuid]];
+    [self.peripheral discoverServices: @[self.serviceUuid]];
 }
 
 //**************************************************************************************************
 - (CBService *) serviceWithUuid: (CBUUID *) serviceUuid fromPeripheral: (CBPeripheral *) peripheral
 {
     if (peripheral.services == nil)
-    {
         return nil;
-    }
     
     NSUInteger index = [peripheral.services indexOfObjectPassingTest: ^BOOL(CBService * obj,
                                                                             __unused NSUInteger idx,
@@ -96,27 +95,24 @@
                         }];
     
     if (index == NSNotFound)
-    {
         return nil;
-    }
     else
-    {
         return peripheral.services[index];
-    }
 }
 //**************************************************************************************************
 - (void) peripheral: (CBPeripheral *) peripheral didDiscoverServices: (NSError *) error
 {
+    __weak BLEFindServiceOperation * weakSelf = self;
     [self finishWithCompletion:^{
         if (error)
         {
-            [self callbackWithError: error result: nil];
+            [weakSelf callbackWithError: error result: nil];
         }
         else
         {
-            CBService * service = [self serviceWithUuid: self.serviceUuid
-                                         fromPeripheral: self.peripheral];
-            [self callbackWithError: nil result: service];
+            CBService * service = [weakSelf serviceWithUuid: weakSelf.serviceUuid
+                                             fromPeripheral: weakSelf.peripheral];
+            [weakSelf callbackWithError: nil result: service];
         }
     }];
 }

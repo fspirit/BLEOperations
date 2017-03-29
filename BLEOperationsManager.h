@@ -21,9 +21,6 @@
 
 - (instancetype) initWithCentralManager: (CBCentralManager *) centralManager;
 
-// TODO: Add default timeout as prop;
-//
-
 @property (readonly) CBCentralManager * centralManager;
 
 - (void) connectToPeripheral: (CBPeripheral *) peripheral
@@ -56,5 +53,7 @@
   atServiceWithUuid: (CBUUID *) serviceUuid
        onPeripheral: (CBPeripheral *) peripheral
          completion: (BLEWriteCharacteristicOperationCallback) completion;
+
+- (void) disconnectFromPeripheral: (CBPeripheral *) peripheral;
 
 @end

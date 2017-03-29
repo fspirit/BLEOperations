@@ -17,7 +17,7 @@ const NSTimeInterval kDefaultConnectTimeout = 10.0;
 @interface BLEOperationsManager ()
 
 @property CBCentralManager * centralManager;
-@property NSMutableSet * operations;
+@property NSMutableDictionary * operationsMap;
 
 @end
 
@@ -35,6 +35,7 @@ const NSTimeInterval kDefaultConnectTimeout = 10.0;
     if (self)
     {
         self.centralManager = centralManager;
+        self.operationsMap = [NSMutableDictionary new];
     }
     
     return self;
@@ -53,18 +54,18 @@ const NSTimeInterval kDefaultConnectTimeout = 10.0;
     
     NSParameterAssert(peripheral != nil);
     
-    __block BLEConnectPeripheralOperation * op = nil;
-    op = [[BLEConnectPeripheralOperation alloc] initWithCentralManager: self.centralManager
+    NSString * simpleKey = [NSUUID new].UUIDString;
+    BLEConnectPeripheralOperation * op =
+        [[BLEConnectPeripheralOperation alloc] initWithCentralManager: self.centralManager
                                                             peripheral: peripheral
                                                                timeout: kDefaultConnectTimeout
-                                                            completion: ^(NSError * error) {
-                                                                [self.operations removeObject: op];
+                                                            completion: ^(NSError * error) {                                                                
                                                                 if (completion)
-                                                                {
                                                                     completion(error);
-                                                                }
+                                                                self.operationsMap[simpleKey] = nil;
                                                             }];
-    [self startOperation: op];
+    self.operationsMap[simpleKey] = op;
+    [op start];
 }
 
 //**************************************************************************************************
@@ -80,20 +81,19 @@ const NSTimeInterval kDefaultConnectTimeout = 10.0;
     NSParameterAssert(serviceUuid != nil);
     NSParameterAssert(peripheral != nil);
     
-    __block BLEFindServiceOperation * op = nil;
-    op = [[BLEFindServiceOperation alloc] initWithCentralManager: self.centralManager
-                                                      peripheral: peripheral
-                                                         timeout: kDefaultTimeout
-                                                     serviceUuid: serviceUuid
-                                                      completion: ^(CBService * service, NSError * error) {
-                                                            [self.operations removeObject: op];
+    NSString * simpleKey = [NSUUID new].UUIDString;
+    BLEFindServiceOperation * op =
+        [[BLEFindServiceOperation alloc] initWithCentralManager: self.centralManager
+                                                     peripheral: peripheral
+                                                        timeout: kDefaultTimeout
+                                                    serviceUuid: serviceUuid
+                                                     completion: ^(CBService * service, NSError * error) {
                                                             if (completion)
-                                                            {
                                                                 completion(service, error);
-                                                            }
+                                                            self.operationsMap[simpleKey] = nil;
                                                       }];
-    
-    [self startOperation: op];
+    self.operationsMap[simpleKey] = op;
+    [op start];
 }
 
 //**************************************************************************************************
@@ -111,22 +111,21 @@ const NSTimeInterval kDefaultConnectTimeout = 10.0;
     NSParameterAssert(service != nil);
     NSParameterAssert(peripheral != nil);
     
-    __block BLEFindCharacteristicOperation * op = nil;
-    op = [[BLEFindCharacteristicOperation alloc] initWithCentralManager: self.centralManager
+    NSString * simpleKey = [NSUUID new].UUIDString;
+    BLEFindCharacteristicOperation * op =
+        [[BLEFindCharacteristicOperation alloc] initWithCentralManager: self.centralManager
                                                              peripheral: peripheral
                                                                 timeout: kDefaultConnectTimeout
                                                                 service: service
                                                      characteristicUuid: serviceUuid
                                                              completion: ^(CBCharacteristic * characteristic, NSError * error) {
-                                                                 [self.operations removeObject: op];
                                                                  if (completion)
-                                                                 {
                                                                      completion(characteristic, error);
-                                                                 }
-
+                                                                 self.operationsMap[simpleKey] = nil;
                                                              }];
     
-    [self startOperation: op];
+    self.operationsMap[simpleKey] = op;
+    [op start];
 }
 
 //**************************************************************************************************
@@ -142,20 +141,19 @@ const NSTimeInterval kDefaultConnectTimeout = 10.0;
     NSParameterAssert(characteristic != nil);
     NSParameterAssert(peripheral != nil);
     
-    __block BLEReadCharacteristicOperation * op = nil;
-    op = [[BLEReadCharacteristicOperation alloc] initWithCentralManager: self.centralManager
+    NSString * simpleKey = [NSUUID new].UUIDString;
+    BLEReadCharacteristicOperation * op =
+        [[BLEReadCharacteristicOperation alloc] initWithCentralManager: self.centralManager
                                                              peripheral: peripheral
                                                                 timeout: kDefaultTimeout
                                                          characteristic: characteristic
                                                              completion: ^(NSData * value, NSError * error) {
-                                                                 [self.operations removeObject: op];
                                                                  if (completion)
-                                                                 {
                                                                      completion(value, error);
-                                                                 }
-
+                                                                 self.operationsMap[simpleKey] = nil;
                                                              }];
-    [self startOperation: op];
+    self.operationsMap[simpleKey] = op;
+    [op start];
 }
 
 //**************************************************************************************************
@@ -173,21 +171,21 @@ const NSTimeInterval kDefaultConnectTimeout = 10.0;
     NSParameterAssert(characteristic != nil);
     NSParameterAssert(peripheral != nil);
     
-    __block BLEWriteCharacteristicOperation * op = nil;
-    op = [[BLEWriteCharacteristicOperation alloc] initWithCentralManager: self.centralManager
+    NSString * simpleKey = [NSUUID new].UUIDString;
+    BLEWriteCharacteristicOperation * op =
+        [[BLEWriteCharacteristicOperation alloc] initWithCentralManager: self.centralManager
                                                               peripheral: peripheral
                                                                  timeout: kDefaultTimeout
                                                           characteristic: characteristic
                                                                     data: data
                                                               completion: ^(NSError * error) {
-                                                                  [self.operations removeObject: op];
                                                                   if (completion)
-                                                                  {
                                                                     completion(error);
-                                                                  }
-                                                                  
+                                                                  self.operationsMap[simpleKey] = nil;
                                                               }];
-    [self startOperation: op];
+    self.operationsMap[simpleKey] = op;
+    [op start];
+
 }
 
 //**************************************************************************************************
@@ -205,20 +203,19 @@ const NSTimeInterval kDefaultConnectTimeout = 10.0;
     NSParameterAssert(serviceUuid != nil);
     NSParameterAssert(peripheral != nil);
     
-    __block BLECompoundReadOperation * op = nil;
-    op = [[BLECompoundReadOperation alloc] initWithOperationsManager: self
+    NSString * simpleKey = [NSUUID new].UUIDString;
+    BLECompoundReadOperation * op =
+        [[BLECompoundReadOperation alloc] initWithOperationsManager: self
                                                           peripheral: peripheral
                                                          serviceUuid: serviceUuid
                                                   characteristicUuid: characteristicUuid
                                                           completion: ^(NSData *value, NSError *error) {
-                                                              [self.operations removeObject: op];
                                                               if (completion)
-                                                              {
                                                                   completion(value, error);
-                                                              }
-                                                              
+                                                              self.operationsMap[simpleKey] = nil;
                                                           }];
-    [self startOperation: op];
+    self.operationsMap[simpleKey] = op;
+    [op start];
 }
 
 //**************************************************************************************************
@@ -237,31 +234,27 @@ const NSTimeInterval kDefaultConnectTimeout = 10.0;
     NSParameterAssert(serviceUuid != nil);
     NSParameterAssert(peripheral != nil);
     
-    __block BLECompoundWriteOperation * op = nil;
-    op = [[BLECompoundWriteOperation alloc] initWithOperationsManager: self
+    NSString * simpleKey = [NSUUID new].UUIDString;
+    BLECompoundWriteOperation * op =
+        [[BLECompoundWriteOperation alloc] initWithOperationsManager: self
                                                            peripheral: peripheral
                                                           serviceUuid: serviceUuid
                                                    characteristicUuid: characteristicUuid
                                                                  data: data
                                                            completion: ^(NSError *error) {
-                                                               [self.operations removeObject: op];
                                                                if (completion)
-                                                               {
                                                                     completion(error);
-                                                               }                                                               
+                                                               self.operationsMap[simpleKey] = nil;
                                                            }];
-    [self startOperation: op];
+    self.operationsMap[simpleKey] = op;
+    [op start];
 }
 
-#pragma mark - Private
-
-
 //**************************************************************************************************
-- (void) startOperation: (id<BLEOperationProtocol>) op
+- (void) disconnectFromPeripheral: (CBPeripheral *) peripheral
 {
-    [self.operations addObject: op];
-    
-    [op start];
+    if (peripheral)
+        [self.centralManager cancelPeripheralConnection: peripheral];
 }
 
 @end

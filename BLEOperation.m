@@ -121,9 +121,7 @@
 - (void) finishWithCompletion: (BLEOperationCompletion) completion
 {
     if ([self stopTimeoutHandler])
-    {
         completion();
-    }    
 }
 
 //**************************************************************************************************
